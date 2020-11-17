@@ -1,0 +1,44 @@
+QFrame#box {
+  /* min-width: 300px;
+  max-width: 300px;
+  min-height: 520px;
+  max-height: 520px; */
+}
+
+QFrame#bg:hover {
+  background-color: #eeeeee;
+}
+
+QLabel#tip {
+  min-width: 300px;
+  max-width: 300px;
+  min-height: 30px;
+  max-height: 30px;
+  font-size: 18px;
+  qproperty-alignment: AlignCenter;
+  color: #444444;
+  background-color: #cccccc;
+}
+
+QLabel#bg {
+  min-width: 300px;
+  max-width: 300px;
+  min-height: 520px;
+  max-height: 520px;
+  background-color: #cccccc;
+  /* background-color: rgba(0,0,0,0.6); */
+}
+
+QPushButton#btn {
+  max-width: 180px;
+  min-height: 30px;
+  font-size: 18px;
+  color: #fafafb;
+  background-color: #444444;
+}
+
+QPushButton#btn::pressed {
+  font-size: 18px;
+  color: #fafafb;
+  background-color: #888888;
+}

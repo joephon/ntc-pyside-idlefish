@@ -5,9 +5,11 @@ from project.mainwindow import MainWindow
 import sys
 
 if __name__ == '__main__':
-    appctxt = ApplicationContext()  # 1. Instantiate ApplicationContext
+    appctx = ApplicationContext()  # 1. Instantiate ApplicationContext
     window = MainWindow()
+    style_sheet = appctx.get_resource('default.qss')
+    appctx.app.setStyleSheet(open(style_sheet).read())
     # window.resize(1400, 900)
     window.show()
-    exit_code = appctxt.app.exec_()  # 2. Invoke appctxt.app.exec_()
+    exit_code = appctx.app.exec_()  # 2. Invoke appctx.app.exec_()
     sys.exit(exit_code)

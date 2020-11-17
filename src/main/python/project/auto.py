@@ -45,7 +45,9 @@ class DeviceHub(QObject):
     def call(self, serial=None):
         try:
             self.store[serial] = u2.connect(serial)
-            self.called.emit(dict(serial=self.store[serial]))
+            print(self.store[serial].wlan_ip + ':7912',
+                  self.store[serial].address)
+            self.called.emit({serial: self.store[serial]})
         except Exception as error:
             traceback.print_exc()
             print(error)

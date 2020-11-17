@@ -2,11 +2,10 @@ from PySide2.QtWidgets import QMainWindow, QLabel, QMessageBox, QFrame, QHBoxLay
 from PySide2.QtCore import Qt, Slot, Signal
 from ui.mainwindow import Ui_MainWindow
 from project.auto import DeviceHub
+from project.device import Device
 
 
 class MainWindow(QMainWindow):
-    seeked = Signal()
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
@@ -15,7 +14,6 @@ class MainWindow(QMainWindow):
         self.init_events()
         self.hub = DeviceHub()
         self.hub.seeked.connect(self.on_hub_seek)
-        self.seeked.connect(self.show_result)
 
     def init_events(self):
         self.ui.searchBtn.clicked.connect(
@@ -30,25 +28,20 @@ class MainWindow(QMainWindow):
 
     @Slot(list)
     def on_hub_seek(self, devices):
-        self.devices = devices
         self.ui.searchBtn.setText('搜索设备')
         QMessageBox.information(self, '搜索结果',
-                                '发现{}台设备'.format(len(self.devices)),
+                                '发现{}台设备'.format(len(self.hub.hold)),
                                 QMessageBox.Ok)
 
         if len(devices):
-            self.seeked.emit()
+            self.show_result()
 
     @Slot()
     def show_result(self):
         self.panel = QFrame()
+        self.panel.setWindowTitle('设备列表')
         self.panel_layout = QHBoxLayout(self.panel)
-        for i in self.devices:
-            setattr(self, i.serial, QFrame())
-            layout = QHBoxLayout(getattr(self, i.serial))
-            bg = QPushButton(i.serial)
-            #  bg.setScaledContents(True)
-            bg.setStyleSheet('background-color:orange;')
-            layout.addWidget(bg)
-            self.panel_layout.addWidget(getattr(self, i.serial))
+        for i in self.hub.hold:
+            device = Device(serial=i.serial, hub=self.hub)
+            self.panel_layout.addWidget(device)
         self.panel.show()
