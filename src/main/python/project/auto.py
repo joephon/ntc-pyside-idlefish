@@ -82,7 +82,7 @@ class TTask(QThread):
 
     def stop(self, reason=None):
         print('Mission Stopped as {}'.format(reason or 'Normal'))
-        self.quit()
+        self.terminate()
 
     def run(self, steps=None):
         print('Invoke at {}'.format(self.start_at))
@@ -217,7 +217,7 @@ class TTask(QThread):
                 self.form_data_dict['持续时间']))
             self.d.toast.show(
                 '按计划工作了{}分钟，准备结束'.format(self.form_data_dict['持续时间']), 5)
-            self.quit()
+            self.stop()
         else:
             print('sleep for {} seconds'.format(self.form_data_dict['休息间隔']))
             self.count_down(int(self.form_data_dict['休息间隔']))

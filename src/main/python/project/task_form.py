@@ -1,6 +1,7 @@
 from PySide2.QtGui import QPixmap, QImage, QFont
-from PySide2.QtCore import Qt, Slot, Signal, QObject
+from PySide2.QtCore import Qt, Slot, Signal, QObject, QThread, QTimer
 from PySide2.QtWidgets import QFrame, QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QFormLayout, QLineEdit, QMessageBox, QToolTip
+import time
 
 
 class TaskForm(QFrame):
@@ -8,6 +9,8 @@ class TaskForm(QFrame):
         super().__init__()
         self.parent = parent
         self.setupUi()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.progress_flash)
 
     def setupUi(self):
         self.setWindowTitle('设置任务详情')
@@ -57,6 +60,39 @@ class TaskForm(QFrame):
     def run_task(self):
         self.parent.hub.run(form_data_dict=self.form_data_dict,
                             serial=self.parent.serial)
-        # self.task = TTask(name='go', boss=self)
-        # self.task.start()
-        # self.bg.setToolTip('该设备执行任务中...')
+
+        self.task = self.parent.hub.task_pool[self.parent.serial]
+        self.parent.total_time_left.setRange(
+            0,
+            int(self.task.form_data_dict['持续时间']) * 60)
+        self.parent.qty_left.setRange(0, int(self.task.form_data_dict['休息数量']))
+        self.timer.start(1000)
+        # self.pthread = PThread(self)
+        # self.pthread.start()
+
+    def progress_flash(self):
+        self.task = self.parent.hub.task_pool[self.parent.serial]
+        self.parent.total_time_left.setValue(
+            int(time.time() - self.task.start_at))
+        self.parent.qty_left.setValue(int(self.task.qty))
+        print(time.time() - self.task.start_at)
+
+
+class PThread(QThread):
+    def __init__(self, parent=None):
+        super().__init__()
+        self.parent = parent
+        self.task = self.parent.parent.hub.task_pool[self.parent.parent.serial]
+        self.parent.parent.total_time_left.setRange(
+            0,
+            int(self.task.form_data_dict['持续时间']) * 60)
+        self.parent.parent.qty_left.setRange(
+            0, int(self.task.form_data_dict['休息数量']))
+
+    def run(self):
+        while (True):
+            self.sleep(1)
+            self.parent.parent.total_time_left.setValue(
+                int(time.time() - self.task.start_at))
+            self.parent.parent.qty_left.setValue(int(self.task.qty))
+            print(time.time() - self.task.start_at)
