@@ -24,7 +24,7 @@ QLabel#bg {
   min-width: 300px;
   max-width: 300px;
   min-height: 520px;
-  max-height: 520px;
+  /* max-height: 520px; */
   background-color: #cccccc;
   /* background-color: rgba(0,0,0,0.6); */
 }

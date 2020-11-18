@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QLabel, QMessageBox, QFrame, QVBoxLayout, QHBoxLayout, QPushButton
-from PySide2.QtCore import Qt, Slot, Signal
+from PySide2.QtCore import Qt, Slot, Signal, QTimer, QThread
 from PySide2.QtGui import QPixmap
 from fbs_runtime.application_context.PySide2 import ApplicationContext
 from project.auto import DeviceHub
@@ -39,10 +39,15 @@ class Device(QFrame, ApplicationContext):
         if text == '使用设备':
             self.btn.setText('启动设备中...')
             self.hub.call(self.serial)
-            img_data = self.hub.store[self.serial].screenshot()
-            self.bg.setPixmap(QPixmap(img_data.toqpixmap()))
+            self.d = self.hub.store[self.serial]
+            self.img_data = self.d.screenshot()
+            # self.bg.setPixmap(
+            #     QPixmap(self.img_data.toqpixmap().scaled(
+            #         300, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)))
+            self.bg.setPixmap(QPixmap(self.img_data.toqpixmap()))
             self.bg.setScaledContents(True)
             self.btn.setText('开始任务')
+            self.update_panel()
 
         elif text == '开始任务':
             self.task_form = TaskForm(self)
@@ -51,8 +56,22 @@ class Device(QFrame, ApplicationContext):
         elif text == '结束任务':
             print('end')
 
-        # self.btn.hide()
+    def update_panel(self):
+        self.u = UThread(self)
+        self.u.start()
 
     @Slot(dict)
     def on_called(self, device):
         pass
+
+
+class UThread(QThread):
+    def __init__(self, parent=None):
+        super().__init__()
+        self.parent = parent
+
+    def run(self):
+        while (True):
+            self.sleep(1)
+            self.parent.img_data = self.parent.d.screenshot()
+            self.parent.bg.setPixmap(QPixmap(self.parent.img_data.toqpixmap()))
